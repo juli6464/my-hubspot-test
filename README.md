@@ -108,29 +108,30 @@ my-hubspot-test/
 ├── README.md
 └── src/
     ├── config/
-    │   └── env.js                 # Validación de variables de entorno
+    │   └── env.js                 # Environment variables validation
     ├── clients/
-    │   └── hubSpotClient.js       # Cliente HTTP centralizado (Axios + interceptores para 429/retry)
+    │   └── hubSpotClient.js       # Centralized HTTP client (Axios + 429/retry interceptors)
     ├── repositories/
-    │   ├── contactRepository.js   # Abstracción CRUD para Contactos
-    │   └── dealRepository.js      # Abstracción CRUD para Negocios (Deals)
+    │   ├── contactRepository.js   # CRUD abstraction for Contacts
+    │   └── dealRepository.js      # CRUD abstraction for Deals
     ├── services/
-    │   └── hubSpotService.js      # Orquestador de negocio (Sync, asociaciones, lógica principal)
+    │   └── hubSpotService.js      # Business logic orchestrator (sync, associations, main logic)
     ├── utils/
-    │   ├── handleErrors.js        # Normalización de errores, logs seguros y backoff
-    │   ├── validator.js           # Validación de payloads antes de enviar
-    │   └── streams.js              # Streams de Node.js (Requerido en Sección 1)
-    ├── fundamentals/              # Sección 1: Node.js Fundamentals
+    │   ├── handleErrors.js        # Error normalization, safe logging, and backoff
+    │   ├── validator.js            # Payload validation before sending
+    │   └── streams.js              # Node.js Streams (Required in Section 1)
+    ├── fundamentals/              # Section 1: Node.js Fundamentals
     │   ├── callbacks.js
     │   ├── asyncAwait.js
     │   ├── utils_module.js
     │   └── main.js
-    └── examples/                  # Scripts ejecutables (Sección 2)
+    └── examples/                  # Executable scripts (Section 2)
         ├── create-contact.js
         ├── list-contacts.js
         ├── create-deal.js
         └── sync-data.js
 ```
+
 
 ## What You Can Work On Before Receiving the Token
 
