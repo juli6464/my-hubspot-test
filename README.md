@@ -87,6 +87,18 @@ PUT /crm/v4/objects/contacts/{contactId}/associations/deals/{dealId}
 
 ## Running Examples
 
+### Test  connection
+
+```bash
+node src/examples/test-connection.js
+```
+
+### Create contact
+
+```bash
+node src/examples/create-contact.js
+```
+
 ### List contacts
 
 ```bash
