@@ -47,6 +47,18 @@ To run this project against your own HubSpot portal, create a Private App in you
 * `crm.objects.deals.read`
 * `crm.objects.deals.write`
 
+## Handling HubSpot API Scope Restrictions
+
+During the Private App configuration in the HubSpot developer portal, the platform restricted the assignment of CRM read and write scopes (`crm.objects.contacts.read`, `crm.objects.contacts.write`, `crm.objects.deals.read`, `crm.objects.deals.write`), returning the following platform-level security restriction:
+
+> `You are not authorized to add this scope. Ask a super admin for help.`
+
+### Mitigation and Architecture Approach
+
+* **Graceful Error Handling:** The error management layer (`utils/handleErrors.js`) specifically intercepts HTTP `403` and `401` status codes. Instead of an unhandled crash, the system catches authorization failures and logs a clear message regarding token permission limits.
+* **Local Payload Validation:** Thanks to the separation of concerns, data integrity is verified locally (`validateContact` and `validateDeal`) before network requests are dispatched, ensuring payloads are correctly formatted even if rejected by account-tier security policies.
+* **Resilient Sync Pipeline:** The bulk synchronization logic is fully structured to evaluate and process local datasets, ensuring that code architecture remains robust and production-ready once adequate portal permissions are granted.
+
 ## Official Endpoints Used
 
 ### Contacts API

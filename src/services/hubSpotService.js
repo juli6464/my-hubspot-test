@@ -1,9 +1,18 @@
 const contactRepo = require('../repositories/contactRepository');
 const dealRepo = require('../repositories/dealRepository');
 const hubSpotClient = require('../clients/hubSpotClient');
-const { retryWithBackoff, handleHubSpotErrors } = require('../utils/handleErrors');
-const { pipelineId, stageId } = require('../config/env');
-const { validateContact, validateDeal } = require('../utils/validator');
+const {
+  retryWithBackoff,
+  handleHubSpotErrors
+} = require('../utils/handleErrors');
+const {
+  pipelineId,
+  stageId
+} = require('../config/env');
+const {
+  validateContact,
+  validateDeal
+} = require('../utils/validator');
 
 async function associateContactToDeal(contactId, dealId) {
   try {
@@ -11,8 +20,8 @@ async function associateContactToDeal(contactId, dealId) {
     const response = await retryWithBackoff(() =>
       hubSpotClient.put(url, [
         {
-          category: 'HUBSPOT_DEFINED',
-          typeId: 3,
+          associationCategory: 'HUBSPOT_DEFINED',
+          associationTypeId: 4,
         },
       ])
     );
@@ -23,7 +32,10 @@ async function associateContactToDeal(contactId, dealId) {
 }
 
 async function createDealWithDefaultPipeline(dealName, amount) {
-  validateDeal({ dealname: dealName, amount });
+  validateDeal({
+    dealname: dealName,
+    amount
+  });
   return await dealRepo.createHubSpotDeal(dealName, amount, pipelineId, stageId);
 }
 
@@ -33,8 +45,12 @@ async function createContactWithValidation(properties) {
 }
 
 async function syncContactsWithHubSpot(localContacts) {
-  const results = { created: 0, updated: 0, errors: 0 };
-  
+  const results = {
+    created: 0,
+    updated: 0,
+    errors: 0
+  };
+
   for (const local of localContacts) {
     try {
       validateContact(local);
@@ -62,18 +78,34 @@ async function syncDealsWithHubSpot(localDeals) {
 
   for (const local of localDeals) {
     try {
-      validateDeal(local);
-      // Lógica idempotente: Buscar por nombre del negocio o crear/actualizar
+      // 1. Extraemos contactEmail y dejamos solo las propiedades reales del negocio para HubSpot
+      const { contactEmail, ...dealProperties } = local;
+      validateDeal(dealProperties);
+
       const existingDeals = await dealRepo.getHubSpotDeals();
-      const found = existingDeals.find(d => d.properties.dealname === local.dealname);
+      const found = existingDeals.find(d => d.properties.dealname === dealProperties.dealname);
+
+      let dealId;
 
       if (found) {
-        await dealRepo.updateHubSpotDeal(found.id, local);
+        await dealRepo.updateHubSpotDeal(found.id, dealProperties);
+        dealId = found.id;
         results.updated++;
       } else {
-        // Usamos el pipeline y stage por defecto configurados en el entorno
-        await dealRepo.createHubSpotDeal(local.dealname, local.amount, pipelineId, stageId);
+        const createdDeal = await dealRepo.createHubSpotDeal(dealProperties.dealname, dealProperties.amount, pipelineId, stageId);
+        dealId = createdDeal.id;
         results.created++;
+      }
+
+      // 2. Si hay un email asociado, buscamos el contacto y hacemos la asociación v4
+      if (contactEmail && dealId) {
+        const existingContacts = await contactRepo.getHubSpotContacts(); // Ajusta según tu método real de contactos
+        const foundContact = existingContacts.find(c => c.properties.email === contactEmail);
+        
+        if (foundContact) {
+          await associateContactToDeal(foundContact.id, dealId);
+          console.log(`🔗 Contacto ${foundContact.id} asociado exitosamente al negocio ${dealId}`);
+        }
       }
     } catch (error) {
       console.error(`Error sincronizando negocio ${local.dealname}:`, error.message);

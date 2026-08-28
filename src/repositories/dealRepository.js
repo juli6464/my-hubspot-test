@@ -6,8 +6,8 @@ async function createHubSpotDeal(dealName, amount, pipeline, stage) {
     const properties = {
       dealname: dealName,
       amount: amount.toString(),
-      hs_pipeline: pipeline,
-      hs_stage: stage,
+      pipeline: pipeline,
+      dealstage: stage,
     };
     const response = await retryWithBackoff(() =>
       hubSpotClient.post('/crm/v3/objects/deals', { properties })

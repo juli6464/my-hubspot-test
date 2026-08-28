@@ -1,10 +1,12 @@
 [
   {
     "dealname": "Negocio Proyecto Web - Juan Pérez",
-    "amount": 1500.00
+    "amount": 1500.00,
+    "contactEmail": "test1@example.com"
   },
   {
     "dealname": "Consultoría E-commerce - María Gómez",
-    "amount": 3200.50
+    "amount": 3200.50,
+    "contactEmail": "test2@example.com"
   }
 ]
