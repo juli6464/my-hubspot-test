@@ -1,0 +1,18 @@
+{
+  "name": "my-hubspot-test",
+  "version": "1.0.0",
+  "description": "NodeJS - HubSpot CRM Integration",
+  "main": "src/examples/list-contacts.js",
+  "scripts": {
+    "start": "node src/examples/list-contacts.js",
+    "test:fundamentals": "node src/fundamentals/asyncAwait.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.20.0",
+    "dotenv": "^17.4.2"
+  }
+}
