@@ -57,11 +57,38 @@ async function syncContactsWithHubSpot(localContacts) {
   return results;
 }
 
+async function syncDealsWithHubSpot(localDeals) {
+  const results = { created: 0, updated: 0, errors: 0 };
+
+  for (const local of localDeals) {
+    try {
+      validateDeal(local);
+      // Lógica idempotente: Buscar por nombre del negocio o crear/actualizar
+      const existingDeals = await dealRepo.getHubSpotDeals();
+      const found = existingDeals.find(d => d.properties.dealname === local.dealname);
+
+      if (found) {
+        await dealRepo.updateHubSpotDeal(found.id, local);
+        results.updated++;
+      } else {
+        // Usamos el pipeline y stage por defecto configurados en el entorno
+        await dealRepo.createHubSpotDeal(local.dealname, local.amount, pipelineId, stageId);
+        results.created++;
+      }
+    } catch (error) {
+      console.error(`Error sincronizando negocio ${local.dealname}:`, error.message);
+      results.errors++;
+    }
+  }
+  return results;
+}
+
 module.exports = {
   associateContactToDeal,
   createDealWithDefaultPipeline,
   createContact: createContactWithValidation,
   syncContactsWithHubSpot,
+  syncDealsWithHubSpot,
   getContactNames: contactRepo.getHubSpotContactNames,
   getContacts: contactRepo.getHubSpotContacts,
   updateContact: contactRepo.updateHubSpotContact,

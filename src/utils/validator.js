@@ -1,4 +1,4 @@
-function validateContact(properties) {
+export function validateContact(properties) {
   if (!properties || typeof properties !== 'object') {
     throw new Error('El payload del contacto debe ser un objeto válido.');
   }
@@ -8,7 +8,7 @@ function validateContact(properties) {
   return true;
 }
 
-function validateDeal(properties) {
+export function validateDeal(properties) {
   if (!properties || typeof properties !== 'object') {
     throw new Error('El payload del negocio (deal) debe ser un objeto válido.');
   }
@@ -21,7 +21,15 @@ function validateDeal(properties) {
   return true;
 }
 
-module.exports = {
-  validateContact,
-  validateDeal,
-};
+export function validateHubSpotPayload(entityType, payload) {
+  const properties = payload?.properties || payload;
+
+  switch (entityType) {
+    case 'contact':
+      return validateContact(properties);
+    case 'deal':
+      return validateDeal(properties);
+    default:
+      throw new Error(`Tipo de entidad desconocido para validación: "${entityType}"`);
+  }
+}
