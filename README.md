@@ -53,6 +53,12 @@ During the Private App configuration in the HubSpot developer portal, the platfo
 
 > `You are not authorized to add this scope. Ask a super admin for help.`
 
+## Resolution
+
+* Personal Developer Account: Created a new personal developer account on HubSpot to ensure full administrative control over the portal.  
+* Legacy Apps Configuration: Configured the Private App under the Legacy Apps option within the developer portal, which bypasses restriction policies tied to standard developer test accounts.  
+* Scope Assignment: Successfully added the required CRM scopes (crm.objects.contacts.read, crm.objects.contacts.write, crm.objects.deals.read, crm.objects.deals.write), allowing real end-to-end API testing to run successfully.  
+
 ### Mitigation and Architecture Approach
 
 * **Graceful Error Handling:** The error management layer (`utils/handleErrors.js`) specifically intercepts HTTP `403` and `401` status codes. Instead of an unhandled crash, the system catches authorization failures and logs a clear message regarding token permission limits.
