@@ -117,7 +117,7 @@ PUT /crm/v4/objects/contacts/{contactId}/associations/deals/{dealId}
 node src/fundamentals/callbacks.js
 ```
 
-### Test Promises and Async/Await
+### Promises and Async/Await
 ```bash
 node src/fundamentals/asyncAwait.js
 ```
@@ -127,7 +127,7 @@ node src/fundamentals/asyncAwait.js
 node src/fundamentals/main.js
 ```
 
-### Test Node.js Streams
+### Streams
 
 ```bash
 node -e "require('./src/utils/streams').runStreamExample()"
