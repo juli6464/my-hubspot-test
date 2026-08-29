@@ -20,8 +20,11 @@ async function createHubSpotDeal(dealName, amount, pipeline, stage) {
 
 async function getHubSpotDeals() {
   try {
+    // Agregamos el parámetro para no traer elementos archivados/eliminados
     const response = await retryWithBackoff(() =>
-      hubSpotClient.get('/crm/v3/objects/deals', { params: { limit: 100 } })
+      hubSpotClient.get('/crm/v3/objects/deals', { 
+        params: { limit: 100, archived: false } 
+      })
     );
     return response.data.results || [];
   } catch (error) {
@@ -29,10 +32,15 @@ async function getHubSpotDeals() {
   }
 }
 
-async function updateHubSpotDeal(dealId, properties) {
+async function updateHubSpotDeal(dealId, dealProperties) {
   try {
+    // Garantizamos que las propiedades vayan siempre dentro del objeto { properties: { ... } }
+    const payload = dealProperties.properties 
+      ? dealProperties 
+      : { properties: dealProperties };
+
     const response = await retryWithBackoff(() =>
-      hubSpotClient.patch(`/crm/v3/objects/deals/${dealId}`, { properties })
+      hubSpotClient.patch(`/crm/v3/objects/deals/${dealId}`, payload)
     );
     return response.data;
   } catch (error) {

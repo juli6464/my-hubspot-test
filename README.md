@@ -65,6 +65,23 @@ During the Private App configuration in the HubSpot developer portal, the platfo
 * **Local Payload Validation:** Thanks to the separation of concerns, data integrity is verified locally (`validateContact` and `validateDeal`) before network requests are dispatched, ensuring payloads are correctly formatted even if rejected by account-tier security policies.
 * **Resilient Sync Pipeline:** The bulk synchronization logic is fully structured to evaluate and process local datasets, ensuring that code architecture remains robust and production-ready once adequate portal permissions are granted.
 
+### Deal Synchronization Logic & Idempotency
+
+The synchronization process for deals (`syncDealsWithHubSpot`) is designed with the following business rules and architectural decisions:
+
+1. **Natural Business Key (`dealname` as Primary Identifier):**
+   - The deal's name (`dealname`) acts as the natural unique key for matching local data with HubSpot records.
+   - If a deal with the exact same name already exists in HubSpot, the system treats it as an update, refreshing editable fields (such as the `amount`).
+   - If the local `dealname` is modified, the script intentionally interprets it as a distinct project/entity rather than overwriting history, creating a new deal in HubSpot to ensure independent traceability.
+
+2. **Amount and Property Updates:**
+   - When a deal is matched by its name, any changes made to the local `amount` are automatically pushed and updated in HubSpot via `updateHubSpotDeal`.
+
+3. **Contact Association & Multi-Association Handling:**
+   - Each deal can be linked to a contact via `contactEmail`.
+   - When a contact email is provided or updated, the synchronization looks up the contact and establishes an association using HubSpot's association endpoints.
+   - **Multi-Association behavior:** If a deal is associated with a new email, HubSpot natively appends the new association alongside any previously assigned contacts (rather than replacing them), preserving the full relationship history.
+
 ## Official Endpoints Used
 
 ### Contacts API

@@ -83,23 +83,40 @@ async function syncDealsWithHubSpot(localDeals) {
       validateDeal(dealProperties);
 
       const existingDeals = await dealRepo.getHubSpotDeals();
+      // Imprimimos todos los tratos que trae HubSpot para verificar nombres e IDs reales
+      console.log('Tratos encontrados en HubSpot:', existingDeals.map(d => ({ id: d.id, name: d.properties.dealname })));
       const found = existingDeals.find(d => d.properties.dealname === dealProperties.dealname);
 
       let dealId;
 
       if (found) {
-        await dealRepo.updateHubSpotDeal(found.id, dealProperties);
+        console.log(`🔍 Encontrado en HubSpot -> ID: ${found.id} | Nombre Local: ${dealProperties.dealname}`);
+        // Excluimos pipeline y etapas para evitar conflictos de ID al actualizar
+        const { pipeline, dealstage, hs_stage, ...rest } = dealProperties;
+        
+        // Armamos el objeto limpio con las propiedades editables
+        const updatableProperties = {
+          dealname: rest.dealname,
+          amount: rest.amount ? rest.amount.toString() : undefined
+        };
+        
+        await dealRepo.updateHubSpotDeal(found.id, updatableProperties);
         dealId = found.id;
         results.updated++;
       } else {
-        const createdDeal = await dealRepo.createHubSpotDeal(dealProperties.dealname, dealProperties.amount, pipelineId, stageId);
+        const createdDeal = await dealRepo.createHubSpotDeal(
+          dealProperties.dealname, 
+          dealProperties.amount, 
+          pipelineId, 
+          stageId
+        );
         dealId = createdDeal.id;
         results.created++;
       }
 
       // 2. Si hay un email asociado, buscamos el contacto y hacemos la asociación v4
       if (contactEmail && dealId) {
-        const existingContacts = await contactRepo.getHubSpotContacts(); // Ajusta según tu método real de contactos
+        const existingContacts = await contactRepo.getHubSpotContacts();
         const foundContact = existingContacts.find(c => c.properties.email === contactEmail);
         
         if (foundContact) {
