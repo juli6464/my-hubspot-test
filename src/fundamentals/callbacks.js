@@ -12,4 +12,14 @@ function simulateAsyncOperationWithCallback(filePath, callback) {
   }, 500);
 }
 
+if (require.main === module) {
+  simulateAsyncOperationWithCallback('./src/examples/deals-seed.json', (err, data) => {
+    if (err) {
+      console.error('[Callback Error]:', err.message);
+    } else {
+      console.log('[Callback Success] Datos leídos correctamente. Longitud:', data.length);
+    }
+  });
+}
+
 module.exports = { simulateAsyncOperationWithCallback };

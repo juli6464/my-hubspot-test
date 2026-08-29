@@ -108,7 +108,32 @@ DELETE /crm/v3/objects/deals/{dealId}
 PUT /crm/v4/objects/contacts/{contactId}/associations/deals/{dealId}
 ```
 
-## Running Examples
+# Test Sections
+
+## Section 1
+
+### Synchrony and Callbacks
+```bash
+node src/fundamentals/callbacks.js
+```
+
+### Test Promises and Async/Await
+```bash
+node src/fundamentals/asyncAwait.js
+```
+
+### Modules and CommonJS
+```bash
+node src/fundamentals/main.js
+```
+
+### Test Node.js Streams
+
+```bash
+node -e "require('./src/utils/streams').runStreamExample()"
+```
+
+## Section 2
 
 ### Test  connection
 
@@ -134,17 +159,15 @@ node src/examples/list-contacts.js
 node src/examples/create-deal.js
 ```
 
-### Sync local data
+### Associate a Contact to a Deal
 
 ```bash
 node src/examples/sync-data.js
 ```
 
-### Test Node.js Streams
 
-```bash
-node -e "require('./src/utils/streams').runStreamExample()"
-```
+
+
 
 ## Project Directory Tree
 
